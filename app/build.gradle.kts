@@ -33,6 +33,8 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
+    viewBinding { enable = true }
 }
 
 dependencies {
@@ -45,4 +47,18 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+
+    // - - ViewModel
+    implementation (libs.androidx.lifecycle.viewmodel.ktx)
+    // - - LiveData
+    implementation (libs.androidx.lifecycle.livedata.ktx)
+    // - - Retrofit2
+    implementation (libs.retrofit)
+    implementation (libs.converter.gson)
+    implementation (libs.okhttp)
+    implementation (libs.logging.interceptor)
+    // - - Glide
+    implementation (libs.glide)
+
 }
