@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("kotlin-kapt")
 }
 
 android {
@@ -48,7 +49,6 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-
     // - - ViewModel
     implementation (libs.androidx.lifecycle.viewmodel.ktx)
     // - - LiveData
@@ -60,5 +60,12 @@ dependencies {
     implementation (libs.logging.interceptor)
     // - - Glide
     implementation (libs.glide)
+
+    // - - Room
+    implementation (libs.androidx.room.ktx)
+    //noinspection KaptUsageInsteadOfKsp
+    kapt (libs.androidx.room.compiler)
+    androidTestImplementation (libs.androidx.room.testing)
+
 
 }

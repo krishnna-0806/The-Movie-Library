@@ -1,16 +1,14 @@
 package com.example.themovielibrary.home
 
-import android.content.ContentValues.TAG
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.themovielibrary.R
 import com.example.themovielibrary.databinding.FragmentFetchedMoviesBinding
 import com.example.themovielibrary.home.api.ApiService
 import com.example.themovielibrary.home.api.MovieRepository
@@ -21,8 +19,12 @@ class FetchedMoviesFragment : Fragment() {
     private lateinit var mBinding: FragmentFetchedMoviesBinding
     private lateinit var viewModel: MovieViewModel
     private val retrofitService = ApiService.getInstance()
-    private val adapter = MainAdapter()
-
+    private val mainAdapter: MainAdapter by lazy {
+        MainAdapter(isFavorite) {
+            viewModel.updateFavorite(movie = it)
+        }
+    }
+    private var isFavorite: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,32 +36,53 @@ class FetchedMoviesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        fetchedNewlyMovies()
-
-    }
-
-    private fun fetchedNewlyMovies() {
         viewModel = ViewModelProvider(
             this,
-            ViewModelFactory(MovieRepository(retrofitService))
+            ViewModelFactory(MovieRepository(retrofitService, requireActivity()))
         )[MovieViewModel::class.java]
 
-        val orientation = this.resources.configuration.orientation
-
-        if (orientation == Configuration.ORIENTATION_PORTRAIT){
-            mBinding.recyclerview.layoutManager = GridLayoutManager(requireActivity(), 2)
-        }
-        else{
-            mBinding.recyclerview.layoutManager = GridLayoutManager(requireActivity(), 4)
-        }
-
-        mBinding.recyclerview.adapter = adapter
-        viewModel.movieList.observe(requireActivity(), Observer {
-            Log.d(TAG, "onCreate: $it")
-            adapter.setMovieList(it.results)
-        })
-        viewModel.errorMessage.observe(requireActivity(), Observer {})
-        viewModel.getAllMovies()
+        setUpRecyclerView()
+        setUpObservers()
+        setUpClickListeners()
     }
+
+    private fun setUpRecyclerView() {
+        val orientation = this.resources.configuration.orientation
+        mBinding.recyclerview.apply {
+            layoutManager = if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+                GridLayoutManager(requireActivity(), 2)
+            } else {
+                GridLayoutManager(requireActivity(), 4)
+            }
+            adapter = mainAdapter
+        }
+    }
+
+    private fun setUpObservers() {
+        viewModel.movieList.observe(viewLifecycleOwner) { list ->
+            if (isFavorite) {
+                mainAdapter.setMovieList(list.filter { it.isFavorite })
+            } else {
+                mainAdapter.setMovieList(list)
+            }
+        }
+    }
+
+    private fun setUpClickListeners() {
+        mBinding.tvFilter.apply {
+            setOnClickListener {
+                if (isFavorite) {
+                    text = requireActivity().getString(R.string.all_movies)
+                    viewModel.movieList.value?.let { it1 -> mainAdapter.setMovieList(it1) }
+                } else {
+                    text = requireActivity().getString(R.string.favorite_movies)
+                    viewModel.movieList.value?.let { list ->
+                        mainAdapter.setMovieList(list.filter { it.isFavorite })
+                    }
+                }
+                isFavorite = !isFavorite
+            }
+        }
+    }
+
 }
