@@ -4,7 +4,6 @@ import com.example.themovielibrary.home.BASE_URL
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
@@ -17,7 +16,7 @@ interface ApiService {
         "Accept: application/json"
     )
     @GET("popular?language=en-US&page=1")
-    fun getAllMovies(): Call<MovieDetails>
+    suspend fun getAllMovies(): retrofit2.Response<MovieDetails>
 
     companion object {
 

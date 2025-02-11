@@ -1,29 +1,35 @@
 package com.example.themovielibrary.home
 
-import androidx.lifecycle.MutableLiveData
+import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import com.example.themovielibrary.home.api.MovieDetails
+import androidx.lifecycle.viewModelScope
+import com.example.themovielibrary.home.api.Movie
 import com.example.themovielibrary.home.api.MovieRepository
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-class MovieViewModel constructor(private val repository: MovieRepository)  : ViewModel() {
+class MovieViewModel(private val repository: MovieRepository) : ViewModel() {
+    val movieList: LiveData<List<Movie>> = repository.fetchMovieFromRoom()
 
-    val movieList = MutableLiveData<MovieDetails>()
-    val errorMessage = MutableLiveData<String>()
+    init {
+        getAllMovies()
+    }
 
-     fun getAllMovies() {
-        val response = repository.getAllMovies()
-        response.enqueue(object : Callback<MovieDetails> {
-
-            override fun onResponse(call: Call<MovieDetails>, response: Response<MovieDetails>) {
-                movieList.postValue(response.body())
+    private fun getAllMovies() = viewModelScope.launch(Dispatchers.IO) {
+       if (movieList.value.isNullOrEmpty()) {
+            val response = repository.getMoviesFromApi()
+            if (response.isSuccessful) {
+                response.body()?.results?.let {
+                    repository.insert(it)
+                }
+            } else {
+                Log.e("Error:", response.message())
             }
+        }
+    }
 
-            override fun onFailure(call: Call<MovieDetails>, t: Throwable) {
-                errorMessage.postValue(t.message)
-            }
-        })
+    fun updateFavorite(movie: Movie) = viewModelScope.launch(Dispatchers.IO) {
+        repository.updateMovie(movie)
     }
 }
