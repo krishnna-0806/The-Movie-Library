@@ -1,13 +1,16 @@
-package com.example.themovielibrary.home
+package com.example.themovielibrary.home.ui
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.themovielibrary.R
 import com.example.themovielibrary.databinding.ItemMoviesBinding
+import com.example.themovielibrary.home.IMAGE_BASE_URL
 import com.example.themovielibrary.home.api.Movie
 
+@SuppressLint("NotifyDataSetChanged")
 class MainAdapter(private val isFavorite: Boolean, private val onClick: (movie: Movie) -> Unit) :
     RecyclerView.Adapter<MainViewHolder>() {
     private var movies = mutableListOf<Movie>()

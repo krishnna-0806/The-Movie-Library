@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("kotlin-kapt")
+//    id ("dagger.hilt.android.plugin")
 }
 
 android {
@@ -36,6 +37,12 @@ android {
     }
 
     viewBinding { enable = true }
+
+    kapt {
+        javacOptions {
+            option("-Adagger.hilt.android.internal.disableAndroidSuperclassValidation=true")
+        }
+    }
 }
 
 dependencies {
@@ -66,6 +73,14 @@ dependencies {
     //noinspection KaptUsageInsteadOfKsp
     kapt (libs.androidx.room.compiler)
     androidTestImplementation (libs.androidx.room.testing)
+
+    // - - Dagger Hilt
+    implementation (libs.hilt.android)
+    kapt (libs.hilt.compiler)
+
+    implementation (libs.androidx.fragment.ktx)
+
+    implementation("androidx.hilt:hilt-navigation-fragment:1.2.0")
 
 
 }

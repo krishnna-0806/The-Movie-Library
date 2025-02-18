@@ -1,4 +1,4 @@
-package com.example.themovielibrary.home
+package com.example.themovielibrary.home.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -6,10 +6,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.themovielibrary.home.api.Movie
 import com.example.themovielibrary.home.api.MovieRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MovieViewModel(private val repository: MovieRepository) : ViewModel() {
+@HiltViewModel
+class MovieViewModel @Inject constructor(private val repository: MovieRepository) : ViewModel() {
     val movieList: LiveData<List<Movie>> = repository.fetchMovieFromRoom()
 
     init {
@@ -17,7 +20,7 @@ class MovieViewModel(private val repository: MovieRepository) : ViewModel() {
     }
 
     private fun getAllMovies() = viewModelScope.launch(Dispatchers.IO) {
-       if (movieList.value.isNullOrEmpty()) {
+        if (movieList.value.isNullOrEmpty()) {
             val response = repository.getMoviesFromApi()
             if (response.isSuccessful) {
                 response.body()?.results?.let {
