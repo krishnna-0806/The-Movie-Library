@@ -1,20 +1,23 @@
 package com.example.themovielibrary.home.api
 
-import android.content.Context
 import androidx.lifecycle.LiveData
-import com.example.themovielibrary.home.room.MovieRoomDatabase
+import com.example.themovielibrary.home.room.MovieDao
+import com.example.themovielibrary.home.room.MovieDatabase
 import retrofit2.Response
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class MovieRepository(
-    private val apiService: ApiService,
-    context: Context
+@Singleton
+class MovieRepository  @Inject constructor(
+    private val apiService: MovieApiService,
+    private val movieDao: MovieDao
 ) {
 
     suspend fun getMoviesFromApi(): Response<MovieDetails> {
         return apiService.getAllMovies()
     }
 
-    private var movieDao = MovieRoomDatabase.getDatabase(context = context).movieDao()
+//    private var movieDao = MovieDatabase().movieDao()
 
     fun fetchMovieFromRoom(): LiveData<List<Movie>> {
         return movieDao.getMovies()

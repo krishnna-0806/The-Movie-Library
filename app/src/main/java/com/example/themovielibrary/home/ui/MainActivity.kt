@@ -1,4 +1,4 @@
-package com.example.themovielibrary
+package com.example.themovielibrary.home.ui
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
@@ -7,9 +7,11 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
-import com.example.themovielibrary.home.FetchedMoviesFragment
+import com.example.themovielibrary.R
 import com.example.themovielibrary.databinding.ActivityMainBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+//@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var mBinding: ActivityMainBinding

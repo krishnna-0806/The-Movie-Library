@@ -1,4 +1,4 @@
-package com.example.themovielibrary.home
+package com.example.themovielibrary.home.ui
 
 import android.content.res.Configuration
 import android.os.Bundle
@@ -6,19 +6,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.themovielibrary.R
 import com.example.themovielibrary.databinding.FragmentFetchedMoviesBinding
-import com.example.themovielibrary.home.api.ApiService
+import com.example.themovielibrary.home.viewmodel.MovieViewModel
 import com.example.themovielibrary.home.api.MovieRepository
-import com.example.themovielibrary.home.api.ViewModelFactory
+import com.example.themovielibrary.home.dagger.NetworkModule
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class FetchedMoviesFragment : Fragment() {
 
     private lateinit var mBinding: FragmentFetchedMoviesBinding
-    private lateinit var viewModel: MovieViewModel
-    private val retrofitService = ApiService.getInstance()
+    private val viewModel: MovieViewModel by viewModels()
+    /*private val viewModel: MovieViewModel by lazy {
+             ViewModelProvider(this)[MovieViewModel::class.java]
+    }*/
     private val mainAdapter: MainAdapter by lazy {
         MainAdapter(isFavorite) {
             viewModel.updateFavorite(movie = it)
@@ -36,10 +41,6 @@ class FetchedMoviesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(
-            this,
-            ViewModelFactory(MovieRepository(retrofitService, requireActivity()))
-        )[MovieViewModel::class.java]
 
         setUpRecyclerView()
         setUpObservers()
